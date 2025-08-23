@@ -7,18 +7,19 @@ Date: July 15, 2025
 
 import numpy as np
 import matplotlib.pyplot as plt
-
 import scipy.linalg
-
 from scipy.linalg import toeplitz
 import math 
 from scipy.linalg import solve_sylvester
+import time 
+
+### Files created an located in folder
 from b_euler import b_euler
 from red_aug import redaug
 from trunc import trunc
 from addmat import addmat
 from red_aug_gen import redaug_g
-import time 
+
 
 
 def main():
@@ -32,13 +33,11 @@ def main():
     #Length of Domain
     L = 1 
 
-    #create Nx + 1 bins
+    #Uniform cell centered mesh 
     x = np.linspace(0,L,Nx+1)
     y = np.linspace(0,L,Ny+1)
-
     dx = x[1]-x[0] 
     dy = y[1]-y[0]
-
     #cell centered
     x = x[1:Nx+1]-(dx/2)
     y = y[1:Ny+1]-(dy/2)
@@ -47,9 +46,11 @@ def main():
     Tf = 0.3
 
     ##initial condition 
-    d1 = 1/4
-    d2 = 1/9
+    d1 = 1/4 # diffusion coefficient 1 
+    d2 = 1/9 # diffusion coefficient 2
     u = np.outer(np.sin((2*np.pi*x)/L), np.sin((2*np.pi*y)/L))
+
+    ## Exact solution
     exact = np.exp(-(2*np.pi/L)**2*(d1+d2)*Tf) * np.outer(np.sin((2*np.pi*x)/L), np.sin((2*np.pi*y)/L))
     
 
@@ -77,6 +78,7 @@ def main():
     L1errvals = []
     lambdav = []
 
+    ##### Butcher Tables 
 
     ### Butcher tableau (DIRK 2)
 
@@ -166,7 +168,7 @@ def main():
     Stage = len(cvals)
 
 
-    ##
+    ## Loops over lambda values 
     lambdavals = np.arange(0.1, 6.1, 0.1)
 
     ##Start of main loop going through each lambda value 
@@ -181,8 +183,9 @@ def main():
 
         Nt = len(t) # number of steps 
 
-        tol = 1.0e-6
-
+        tol = 1.0e-6 ### Tolerance 
+        
+        ## Initial svd of U 
         U,S, VT = np.linalg.svd(u, full_matrices=False) # computes reduced svd 
         r0 = math.ceil(Nx/3)
         Vx_n = U[:, : r0]
@@ -192,11 +195,12 @@ def main():
 
         
 
-        rankvals = [r_n]
+        rankvals = [r_n] # saves rank value 
         for n in range (1,Nt):
             dtn = t[n] - t[n-1]
-            #print(t[n])
             
+
+            ##Storage 
             Yx = []
             Ys = []
             Yy = []
@@ -207,24 +211,24 @@ def main():
             S_stage = []
             r_stage = []
             
-
+            ## start of stage loop that goes through each stage 
             for i in range(Stage):
 
                 if i == 0: 
                     Vx_1, Vy_1, S_1, r_1 = b_euler(Vx_n,S_n,Vy_n,r_n,dtn,Dxx,Dyy,Nx,Ny,tol,cvals[i])
                     
                     
-                    
+                    ## add to list to store 
                     Vx_stage.append(Vx_1)
                     Vy_stage.append(Vy_1)
                     S_stage.append(S_1)
                     r_stage.append(r_1)
-                    #print(r_1)
+                   
 
                     Vx_list.append(Vx_1)
                     Vy_list.append(Vy_1)
 
-                    #comrpess
+                    #compress
                     Y1x, Y1s, Y1y = addmat(Dxx@Vx_1,S_1,Vy_1,Vx_1,S_1,Dyy@Vy_1)
                     
                     Yx.append(Y1x)
@@ -232,32 +236,22 @@ def main():
                     Yy.append(Y1y)
                     
                 else: 
-                    Vx_d,Vy_d, _,_ = b_euler(Vx_n,S_n,Vy_n,r_n,dtn,Dxx,Dyy,Nx,Ny,tol,cvals[i])
-                    #print(Vx_d.shape)
                     
-                    #print(cvals[i])
+                    Vx_d,Vy_d, _,_ = b_euler(Vx_n,S_n,Vy_n,r_n,dtn,Dxx,Dyy,Nx,Ny,tol,cvals[i])
+
                     
                     Vx_temp = [Vx_d] + Vx_list[::-1] + [Vx_n]
                     Vy_temp = [Vy_d] + Vy_list[::-1] + [Vy_n]
 
                     # reduced augmentation
                     Vx_star, Vy_star, r_star = redaug_g(Vx_temp, Vy_temp, 1.0e-12)
-                    #Vx_star, Vy_star, r_star= redaug(Vx_d,Vx_1,Vx_n, Vy_d,Vy_1,Vy_n, 1.0e-12)
-                    #compress
                     
-                    #print(r_star)
-                    
-                    # print(Vx_star.shape)
-                    # print(Vy_star.shape) 
-                    # print(r_star)
-
+                    ## accumulate weighted stages from butchers table 
                     W1x, W1s, W1y = Vx_n, S_n, Vy_n
                     for j in range(i):
                         W1x, W1s, W1y = addmat(W1x, W1s, W1y, Yx[j], avals[i,j]*dtn*Ys[j], Yy[j])
-                    #print(W1s.shape)
-                    
-                     
-
+                      
+                    ### K & L steps 
                     Vx_aug = Vx_star 
                     Vy_aug = Vy_star
 
@@ -270,21 +264,20 @@ def main():
                     L = solve_sylvester(np.eye(Ny) - avals[i,i]*dtn*Dyy, -avals[i,i]* dtn *(Dxx@Vx_aug).T @Vx_aug, W1y@W1s.T@(W1x.T@ Vx_aug))
                     Vy_nn, _ = np.linalg.qr(L, mode='reduced')
                     
-                    #Vx_nn, Vy_nn, r  = redaug_g([Vx_nn,Vx_1,Vx_n],[Vy_nn,Vy_1,Vy_n], 1.0e-12)
+                   
 
                     #S step 
                     S_nn = solve_sylvester(np.eye(r_star) - avals[i,i]* dtn* Vx_nn.T@ (Dxx@ Vx_nn), -avals[i,i]* dtn* (Dyy@Vy_nn).T @ Vy_nn, (Vx_nn.T@W1x)@W1s@(W1y.T @ Vy_nn ))
                     #S_nn = solve_sylvester(np.eye(r) - avals[i,i]* dtn* Vx_nn.T@ (Dxx@ Vx_nn), -avals[i,i]* dtn* (Dyy@Vy_nn).T @ Vy_nn, (Vx_nn.T@W1x)@W1s@(W1y.T @ Vy_nn ))
                     
-
+                    ##determines if in final stage to avoid unnecessary computation 
                     if i + 1 >= Stage: 
-                        #Vx_nn, S_nn, Vy_nn, r_nn = trunc(Vx_nn,S_nn,Vy_nn,tol)
-                        #print(r_nn)
+                        
                         
                         Vx_stage.append(Vx_nn)
                         Vy_stage.append(Vy_nn)
                         S_stage.append(S_nn)
-                        #r_stage.append(r_nn)
+                  
                         
                     else: 
                         Vx_2, S_2, Vy_2, r_2 = trunc(Vx_nn,S_nn,Vy_nn,tol)
@@ -301,12 +294,12 @@ def main():
                     
                     
                     
-     
+            #check if stiffly accurate 
             if cvals[Stage-1] == 1 and np.array_equal(avals[-1], bvals) == True:
                 Vx_nn, S_nn, Vy_nn, r_nn = trunc(Vx_nn,S_nn,Vy_nn,tol)
-                #pass   
+                
             else:
-
+            ## do final step with b values from butcher table 
                 x = []
                 s = []
                 y = []
@@ -317,7 +310,7 @@ def main():
                     y.append(Vy)
            
                 Vx2, s2,Vy2 = x[0],s[0],y[0]
-                for j in range(0, len(x) - 1, 2): ### THIS FAILS TO HANDLE IF There is an odd number 
+                for j in range(0, len(x) - 1, 2): 
                     Vx2, s2,Vy2 = addmat(x[j],s[j],y[j],x[j+1],s[j+1],y[j+1])
                 
                 #if stage is an odd value 
@@ -326,21 +319,11 @@ def main():
 
                 
                 Vx_nn,S_nn,Vy_nn = addmat(Vx_n, S_n, Vy_n,Vx2, s2,Vy2)
-                # print(Vx_nn)
-                # return
+                
 
                 Vx_nn, S_nn, Vy_nn, r_nn = trunc(Vx_nn,S_nn,Vy_nn,tol)    
-                #print(Vx_nn)
-                #print(S_nn)
-                #print(Vy_nn)
-                #print(r_nn)
-                #return  
-
-                #print('help')
-            #Vx_nn, S_nn, Vy_nn, r_nn = trunc(Vx_nn,S_nn,Vy_nn,tol)
-
-            #print(r_nn)
-            
+               
+            ##final update stage 
             rankvals.append(r_nn)
             Vx_n = Vx_nn
             S_n = S_nn
@@ -348,7 +331,7 @@ def main():
             r_n = r_nn
 
 
-        #u_approx = Vx_nn@S_nn@Vy_nn.T
+     
         u_approx = Vx_n @ S_n @ Vy_n.T
         L1error = dx * dy* np.sum(np.abs(u_approx - exact))
 
@@ -358,7 +341,7 @@ def main():
             
         print(f"λ = {lambdavals[k]:.2f}, error = {L1error:.3e}")
     
-    #figure 1 
+    #figure 1 (edit order as needed)
     plt.figure()
     plt.loglog(lambdav, L1errvals,'b',linewidth=1.5)
     #plt.loglog(lambdav, np.power(lambdav, Stage),'k-.',linewidth=1.5)
