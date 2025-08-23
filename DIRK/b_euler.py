@@ -1,30 +1,26 @@
 """
 DIRK 1 (B.euler function) Function 
+To be used at each stage 
 Author: Joost Almekinders
 Date: July 3, 2025
 
 """
 
 import numpy as np
-
 import scipy.linalg
-
 from scipy.linalg import toeplitz
 import math 
 from scipy.linalg import solve_sylvester
-
 from trunc import trunc
 
 def b_euler(Vx_n,S_n,Vy_n,r_n,dtn,Dxx,Dyy,Nx,Ny,tol,gamma):
-    #print("B_euler...")
-    #RHS
     RHS = Vx_n@ S_n @Vy_n.T
     
     #equate to augmented 
     Vx_aug = Vx_n 
     Vy_aug = Vy_n 
 
-    # kstep 
+    # k step 
     K = solve_sylvester(np.eye(Nx) - gamma * dtn*Dxx, -gamma * dtn *(Dyy @Vy_aug).T@ Vy_aug,  RHS@ Vy_aug)
     Vx_nn, _ = np.linalg.qr(K, mode= 'reduced')
 
