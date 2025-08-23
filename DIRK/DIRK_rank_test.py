@@ -1,6 +1,8 @@
 """ 
 RAIL for DIRK Methods general code
 
+This code is for the RANK test 
+
 Author: Joost Almekinders
 Date: July 15, 2025
 
