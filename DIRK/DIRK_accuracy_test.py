@@ -1,9 +1,8 @@
 """ 
-RAIL for DIRK Methods general code
+RAIL for DIRK Methods general code.
 
 Author: Joost Almekinders
 Date: July 15, 2025
-
 """
 
 import numpy as np
@@ -14,13 +13,11 @@ import scipy.linalg
 from scipy.linalg import toeplitz
 import math 
 from scipy.linalg import solve_sylvester
-
 from b_euler import b_euler
 from red_aug import redaug
 from trunc import trunc
 from addmat import addmat
 from red_aug_gen import redaug_g
-from addmat_gen import addmat_g
 import time 
 
 
@@ -28,11 +25,14 @@ def main():
     print("Start....")
     start_time = time.time()
 
-    #spatial grid 
+    #spatial grid (100x100)
     Nx = 100 
-    Ny = 100 # (100x100)
-    L = 1 #Length of Domain
-    #L = 14
+    Ny = 100 
+    
+    #Length of Domain
+    L = 1 
+
+    #create Nx + 1 bins
     x = np.linspace(0,L,Nx+1)
     y = np.linspace(0,L,Ny+1)
 
@@ -43,13 +43,13 @@ def main():
     x = x[1:Nx+1]-(dx/2)
     y = y[1:Ny+1]-(dy/2)
 
-    # initial condition
+    # Final time 
     Tf = 0.3
-    #Tf = 15
+
+    ##initial condition 
     d1 = 1/4
     d2 = 1/9
     u = np.outer(np.sin((2*np.pi*x)/L), np.sin((2*np.pi*y)/L))
-    #u = np.outer(0.8*np.exp(-15*(x-6.5)**2),np.exp(-15*(y-6.5)**2)) + np.outer(0.5*np.exp(-15*(x-7.5)**2),np.exp(-15*(y-7)**2))
     exact = np.exp(-(2*np.pi/L)**2*(d1+d2)*Tf) * np.outer(np.sin((2*np.pi*x)/L), np.sin((2*np.pi*y)/L))
     
 
@@ -73,7 +73,7 @@ def main():
     Dxx = d1 * Dxx
     Dyy = d2 * Dyy
 
-    
+    ### initiate empty list for error values and lamda values 
     L1errvals = []
     lambdav = []
 
@@ -166,10 +166,10 @@ def main():
     Stage = len(cvals)
 
 
-    #lambdavals = np.arange(0.1, 5.1, 0.1)
+    ##
     lambdavals = np.arange(0.1, 6.1, 0.1)
-    #lambdavals = np.arange(0.5,0.6,0.1)
-    #lambdavals = np.arange(0.4,0.5,0.1)
+
+    ##Start of main loop going through each lambda value 
     for k in range (len(lambdavals)):
         dt = lambdavals[k]*dx
         
