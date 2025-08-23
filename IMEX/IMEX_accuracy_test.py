@@ -30,8 +30,10 @@ def main():
     #spatial grid 
     Nx = 200 
     Ny = 200 # (200x200)
+    # length of Domain 
     L = 4 * np.pi
 
+    # build grid 
     x = np.linspace(-L/2, L/2, Nx+1)
     y = np.linspace(-L/2, L/2, Ny+1)
 
@@ -42,15 +44,18 @@ def main():
     x = x[1:Nx+1]-(dx/2)
     y = y[1:Ny+1]-(dy/2)
 
-    ## initial condition
+    ## final time 
     Tf = 0.5
-    #Tf = 2.3
+
+    ## diffusion coef 
     d = 1/5
     d1 = np.sqrt(d)
     d2 = np.sqrt(d)
-
+    
+    #initial condition
     u = np.outer(np.exp(-x**2), np.exp(-3*y**2))
-    #u = np.outer(np.exp(-x**2), np.exp(-9*y**2))
+    
+    #exact soln 
     exact = np.outer(np.exp(-x**2), np.exp(-3*y**2)) * np.exp(-2*d*Tf)
     
     
@@ -76,31 +81,32 @@ def main():
     Dxx = d * Dxx
     Dyy = d * Dyy
     
-    # Construct column for Dx
+    # Construct Dx
     n_x = np.arange(1, Nx)
     columnx = np.concatenate(([0], 0.5 * (-1)**n_x * 1 / np.tan(n_x * (np.pi * dx / L))))
     Dx = (2 * np.pi / L) * toeplitz(columnx, columnx[np.r_[0, Nx-1:0:-1]])
 
-    # Construct column for Dy
+    # Construct Dy
     n_y = np.arange(1, Ny)
     columny = np.concatenate(([0], 0.5 * (-1)**n_y * 1 / np.tan(n_y * (np.pi * dy / L))))
     Dy = (2 * np.pi / L) * toeplitz(columny, columny[np.r_[0, Ny-1:0:-1]])
 
-    
+    # create flux 1 / flux 2 and g 
     flux1 = [np.ones_like(x), lambda t: -1, y]
 
     flux2 = [x, lambda t: 1, np.ones_like(y)]
-    
-    
+     
     g = [np.column_stack([np.exp(-x**2), x * np.exp(-x**2), (x**2) * np.exp(-x**2), np.exp(-x**2)]),lambda t: np.diag([6*d*np.exp(-2*d*t),-4*np.exp(-2*d*t),
         -4*d*np.exp(-2*d*t), -36*d*np.exp(-2*d*t)]),
     np.column_stack([ np.exp(-3*y**2), y * np.exp(-3*y**2), np.exp(-3*y**2),(y**2) * np.exp(-3*y**2)])]
     
-    #g = [np.column_stack([0*np.exp(-x**2)]),lambda t: np.diag([0*6*d*np.exp(-2*d*t)]), np.column_stack([ 0*np.exp(-3*y**2),])]
     
     
     L1errvals = []
     lambdav = []
+
+
+##################################Butcher tables 
 
 ############## IMEX (2,2,2) 
 
@@ -244,9 +250,9 @@ def main():
 
 
 
-    
+    #lambda values
     lambdavals = np.arange(0.1,2.1,0.1)
-    #lambdavals = np.arange(0.15,0.25,0.1)
+
 
     for k in range (len(lambdavals)):
         dt = lambdavals[k]*dx
@@ -260,8 +266,9 @@ def main():
         Nt = len(t) # number of steps 
 
         
-        tol = 1.0e-8
+        tol = 1.0e-8 #tolerance 
 
+        #computes initial svd 
         U,S, VT = np.linalg.svd(u, full_matrices=False) # computes reduced svd 
         r0 = math.ceil(Nx/3)
         Vx_n = U[:, : r0]
@@ -271,15 +278,13 @@ def main():
         r_n = r0
 
 
-        #print(lambdavals[k])
+      
         rankvals = [r_n]
         for n in range (1,Nt):
             dtn = t[n] - t[n-1]
-            #print(dtn)
-            #print(t[n])
             tn = t[n-1]
             
-        
+            #calls values 
             a1 = flux1[0]
             b1 = flux1[1]
             c1 = flux1[2]
@@ -290,7 +295,7 @@ def main():
             Gxy = g[1]
             Gy = g[2]
  
-
+            #storage 
             Yhatx = []
             Yhats = []
             Yhaty = []
