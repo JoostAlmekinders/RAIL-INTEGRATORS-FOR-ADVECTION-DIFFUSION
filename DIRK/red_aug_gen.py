@@ -1,6 +1,7 @@
 """"
 
 Red AUG general 
+performs the reduced augmentation based off a set tolerance 
 
 Date: July 17, 2025
 Author: Joost Almekinders
@@ -12,12 +13,12 @@ import numpy as np
 
 def redaug_g(Vx_list, Vy_list, tol):
     
-    #Vx_comb = np.hstack(Vx_list)
+    #take list of Vx and combine them and perform QR 
     Qx, Rx = np.linalg.qr(np.hstack(Vx_list), mode='reduced')
     Vx_temp, S_tempx, _ = np.linalg.svd(Rx, full_matrices=False)
     rx = np.sum(S_tempx > tol * S_tempx[0])
     
-    #Vy_comb = np.hstack(Vy_list)
+    # same as above but for Vy
     Qy, Ry = np.linalg.qr(np.hstack(Vy_list), mode='reduced')
     Vy_temp, S_tempy, _ = np.linalg.svd(Ry, full_matrices=False)
     ry = np.sum(S_tempy > tol * S_tempy[0])
