@@ -8,7 +8,6 @@ Date: July 4, 2025
 
 import numpy as np
 import scipy.linalg
-
 import math 
 
 
@@ -20,7 +19,6 @@ def trunc(Vx_nn,S_nn,Vy_nn,tol):
     
 
     Vx_nn  = Vx_nn@ U[:,:r]
-    #Vy_nn = Vy_nn@ VT[:,:r]
     Vy_nn = Vy_nn@ VT[:r,:].T
     S_nn = np.diag(S[:r])
     r_nn = r
