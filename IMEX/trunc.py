@@ -5,7 +5,6 @@ trunc function
 
 import numpy as np
 import scipy.linalg
-
 import math 
 
 
@@ -14,10 +13,9 @@ def trunc(Vx_nn,S_nn,Vy_nn,tol):
     r = np.sum(S > tol * S[0]) 
     if r == 0:
         r = 1
-    
+
 
     Vx_nn  = Vx_nn@ U[:,:r]
-    #Vy_nn = Vy_nn@ VT[:,:r]
     Vy_nn = Vy_nn@ VT[:r,:].T
     S_nn = np.diag(S[:r])
     r_nn = r
