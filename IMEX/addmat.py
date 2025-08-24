@@ -2,7 +2,6 @@ from scipy.linalg import block_diag
 import numpy as np
 import scipy.linalg
 from trunc import trunc
-#from newtrunc import newtrunc
 import numpy as np
 from scipy.linalg import qr, svd, block_diag
 
