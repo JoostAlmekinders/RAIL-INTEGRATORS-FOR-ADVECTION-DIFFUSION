@@ -23,6 +23,7 @@ We must then edit the order of the accuracy plot at the bottom of the file to en
 This line must be edited to look like this: plt.loglog(lambdav, np.power(lambdav, 2),'k-.',linewidth=1.5). 
 
 The code will print the error value at each lamda value like this: 
+///
 Start....
 λ = 0.10, error = 4.898e-06
 λ = 0.20, error = 1.979e-05
@@ -34,6 +35,7 @@ Start....
 λ = 0.80, error = 3.166e-04
 λ = 0.90, error = 3.921e-04
 λ = 1.00, error = 4.950e-04
+///
 
 Ultimately, we will see the accuracy plot with second order for DIRK 2. 
 <img width="631" height="477" alt="Screenshot 2025-08-24 at 11 23 37 AM" src="https://github.com/user-attachments/assets/c56e02f6-7285-4403-916f-48d4d80c01e9" />
@@ -47,4 +49,5 @@ If we run the rank test we get this figure.
 
 
 Reference: 
+Nakao, Joseph, Jing-Mei Qiu, and Lukas Einkemmer. "Reduced Augmentation Implicit Low-rank (RAIL) integrators for advection-diffusion and Fokker–Planck models." SIAM Journal on Scientific Computing 47.2 (2025): A1145-A1169.
 
