@@ -38,7 +38,9 @@ Start....
 Ultimately, we will see the accuracy plot with second order for DIRK 2. 
 <img width="631" height="477" alt="Screenshot 2025-08-24 at 11 23 37 AM" src="https://github.com/user-attachments/assets/c56e02f6-7285-4403-916f-48d4d80c01e9" />
 
-If we run the rank test we get this figure: 
+If we run the rank test we get this figure. 
+
+
 <img width="626" height="472" alt="Screenshot 2025-08-24 at 11 25 55 AM" src="https://github.com/user-attachments/assets/20391cac-760d-4832-bd53-a88cc0894440" />
 
 
