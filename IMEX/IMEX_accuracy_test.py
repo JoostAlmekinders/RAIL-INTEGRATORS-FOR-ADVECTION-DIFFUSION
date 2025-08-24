@@ -1,6 +1,6 @@
 """
 
-Generalized Code for IMEX methods
+Generalized Code for IMEX methods. Accuracy test.
 
 Author: Joost Almekinders
 Date: August 8, 2025
@@ -361,7 +361,7 @@ def main():
                         W1tempx,W1temps,W1tempy = addmat(Vx_n,S_n,Vy_n,W11x, W11s, W11y)
                         W1x,W1s,W1y = addmat(W1tempx, W1temps,W1tempy,W2x,W2s,W2y)
 
-
+                        #K/L/S steps 
                         K = solve_sylvester(np.eye(Nx) - aI[i,i]*dtn*Dxx, -aI[i,i]*dtn *(Dyy@Vy_star).T@Vy_star,  W1x@W1s@(W1y.T@Vy_star))
                         Vx_2, _ = np.linalg.qr(K, mode= 'reduced')
 
@@ -415,8 +415,7 @@ def main():
             else: 
 
 
-                ##Implicit 
-                
+                ##combine Implicit 
                 
                 Vx2,s2,Vy2 = np.zeros(Yx[0].shape),bI[0]*dtn*np.zeros(Ys[0].shape),np.zeros(Yy[0].shape)
                 for j in range(1,len(bI)):
@@ -425,7 +424,7 @@ def main():
                 
 
 
-                ###Explicit 
+                ###combine Explicit 
                 Vx3, s3,Vy3 = Yhatx[0], bE[0]*dtn*Yhats[0], Yhaty[0]
                 for j in range(1,len(bE)):
                     Vx3, s3,Vy3 = addmat(Vx3, s3,Vy3,  Yhatx[j], bE[j]*dtn*Yhats[j], Yhaty[j])
