@@ -42,15 +42,17 @@ def main():
     x = x[1:Nx+1]-(dx/2)
     y = y[1:Ny+1]-(dy/2)
 
-    ## initial condition
-    #Tf = 0.5
+   
+    #final time 
     Tf = 2.3
     d = 1/5
     d1 = np.sqrt(d)
     d2 = np.sqrt(d)
 
-    #u = np.outer(np.exp(-x**2), np.exp(-3*y**2))
+    # Intial condition
     u = np.outer(np.exp(-x**2), np.exp(-9*y**2))
+
+    #exact soln
     exact = np.outer(np.exp(-x**2), np.exp(-3*y**2)) * np.exp(-2*d*Tf)
     
     
@@ -91,11 +93,6 @@ def main():
     flux1 = [np.ones_like(x), lambda t: -1, y]
 
     flux2 = [x, lambda t: 1, np.ones_like(y)]
-    
-    
-    # g = [np.column_stack([np.exp(-x**2), x * np.exp(-x**2), (x**2) * np.exp(-x**2), np.exp(-x**2)]),lambda t: np.diag([6*d*np.exp(-2*d*t),-4*np.exp(-2*d*t),
-    #     -4*d*np.exp(-2*d*t), -36*d*np.exp(-2*d*t)]),
-    # np.column_stack([ np.exp(-3*y**2), y * np.exp(-3*y**2), np.exp(-3*y**2),(y**2) * np.exp(-3*y**2)])]
     
     g = [np.column_stack([0*np.exp(-x**2)]),lambda t: np.diag([0*6*d*np.exp(-2*d*t)]), np.column_stack([ 0*np.exp(-3*y**2),])]
     
@@ -243,7 +240,7 @@ def main():
   
 
     
-    #lambdavals = np.arange(0.1,2.1,0.1)
+
     lambdavals = np.arange(0.15,0.25,0.1)
 
     for k in range (len(lambdavals)):
@@ -258,8 +255,9 @@ def main():
         Nt = len(t) # number of steps 
 
         
-        tol = 1.0e-8
+        tol = 1.0e-8 # tolerance 
 
+        # intial SVD
         U,S, VT = np.linalg.svd(u, full_matrices=False) # computes reduced svd 
         r0 = math.ceil(Nx/3)
         Vx_n = U[:, : r0]
@@ -269,15 +267,14 @@ def main():
         r_n = r0
 
 
-        #print(lambdavals[k])
+
         rankvals = [r_n]
         for n in range (1,Nt):
             dtn = t[n] - t[n-1]
-            #print(dtn)
             print(t[n])
             tn = t[n-1]
             
-        
+            #obatian correct values 
             a1 = flux1[0]
             b1 = flux1[1]
             c1 = flux1[2]
@@ -288,7 +285,7 @@ def main():
             Gxy = g[1]
             Gy = g[2]
 
-
+            #storage 
             Yhatx = []
             Yhats = []
             Yhaty = []
@@ -354,13 +351,15 @@ def main():
                         W1tempx,W1temps,W1tempy = addmat(Vx_n,S_n,Vy_n,W11x, W11s, W11y)
                         W1x,W1s,W1y = addmat(W1tempx, W1temps,W1tempy,W2x,W2s,W2y)
 
-
+                        #k step
                         K = solve_sylvester(np.eye(Nx) - aI[i,i]*dtn*Dxx, -aI[i,i]*dtn *(Dyy@Vy_star).T@Vy_star,  W1x@W1s@(W1y.T@Vy_star))
                         Vx_2, _ = np.linalg.qr(K, mode= 'reduced')
 
+                        #L step 
                         L = solve_sylvester(np.eye(Ny) - aI[i,i]*dtn*Dyy, -aI[i,i]*dtn *(Dxx@Vx_star).T @Vx_star, W1y@W1s.T@(W1x.T@ Vx_star))
                         Vy_2, _ = np.linalg.qr(L, mode='reduced')
 
+                        #S step 
                         S_2 = solve_sylvester(np.eye(R) - aI[i,i]*dtn* Vx_2.T@ (Dxx@ Vx_2), -aI[i,i]*dtn* (Dyy@Vy_2).T @ Vy_2, (Vx_2.T@W1x)@W1s@(W1y.T @ Vy_2))
 
                         
@@ -406,7 +405,7 @@ def main():
             else: 
 
 
-                ##Implicit 
+                ##add up Implicit 
                 
                 Vx2,s2,Vy2 = np.zeros(Yx[0].shape),bI[0]*dtn*np.zeros(Ys[0].shape),np.zeros(Yy[0].shape)
                 for j in range(1,len(bI)):
@@ -415,14 +414,13 @@ def main():
                 
 
 
-                ###Explicit 
+                ###add up Explicit 
                 Vx3, s3,Vy3 = Yhatx[0], bE[0]*dtn*Yhats[0], Yhaty[0]
                 for j in range(1,len(bE)):
                     Vx3, s3,Vy3 = addmat(Vx3, s3,Vy3,  Yhatx[j], bE[j]*dtn*Yhats[j], Yhaty[j])
 
                 
                 ##combine implicit and explicit 
-
                 Vxf,Vsf, Vyf = addmat(Vx2,s2,Vy2, Vx3,s3,Vy3)
 
                 ##final step 
