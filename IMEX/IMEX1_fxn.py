@@ -8,15 +8,12 @@ Date: August 5, 2025
 
 import numpy as np
 import matplotlib.pyplot as plt
-
 import scipy.linalg
-
 from scipy.linalg import toeplitz
 import math 
 from scipy.linalg import solve_sylvester
 from addmat import addmat
 from trunc import trunc
-
 from red_aug_gen import redaug_g
 
 
