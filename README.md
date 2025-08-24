@@ -25,12 +25,10 @@ The code includes a few Butcher tableaus, but **any valid Butcher tableau can be
 
 ---
 
-Structure:
-The library is split into two parts, one with the code for the DIRK methods and the other for IMEX methods. Within each folder you will see the possibilty to run two different tests: the accuracy test and the rank test. The code contains a couple butcher tables, but any valid butcher table can be added. 
-
 
 Example: 
 For DIRK 2 we insert the butcher table in the necessary area within the code like so: 
+<pre> ```python g = 1 - (np.sqrt(2)/2) cvals = np.array([g,1]) bvals = np.array([1-g,g]) avals = np.array([[g,0], [1-g,g]]) Stage = len(cvals) ``` </pre>
     g = 1-(np.sqrt(2)/2) 
     cvals = np.array([g,1])
     bvals = np.array([1-g,g])
