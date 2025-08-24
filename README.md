@@ -2,7 +2,12 @@
 
 This library provides the general code for the RAIL algorithm from this paper: REDUCED AUGMENTATION IMPLICIT LOW-RANK (RAIL) INTEGRATORS FOR ADVECTION-DIFFUSION AND FOKKER--PLANCK MODELS by JOSEPH NAKAO, JING-MEI QIU, AND LUKAS EINKEMMER. DOI.10.1137/23M1622921(https://doi.org/10.1137/23M1622921). 
 
+---
 
+The code in this library is a **generalization** of code necessary to use **DIRK** and **IMEX** methods to solve PDEs.  
+Any valid **Butcher tableau** for DIRK or IMEX methods can be inserted and the code will provide the necessary output.  
+
+---
 
 The code in this library is a generaliztion of code necessary to use DIRK and IMEX moethods to solve PDE's. Any valid butcher table for DIRK or IMEX methods can be inserted and the code will provide the necessary output. 
 
@@ -23,7 +28,7 @@ We must then edit the order of the accuracy plot at the bottom of the file to en
 This line must be edited to look like this: plt.loglog(lambdav, np.power(lambdav, 2),'k-.',linewidth=1.5). 
 
 The code will print the error value at each lamda value like this: 
-///
+
 Start....
 λ = 0.10, error = 4.898e-06
 λ = 0.20, error = 1.979e-05
@@ -35,7 +40,7 @@ Start....
 λ = 0.80, error = 3.166e-04
 λ = 0.90, error = 3.921e-04
 λ = 1.00, error = 4.950e-04
-///
+
 
 Ultimately, we will see the accuracy plot with second order for DIRK 2. 
 <img width="631" height="477" alt="Screenshot 2025-08-24 at 11 23 37 AM" src="https://github.com/user-attachments/assets/c56e02f6-7285-4403-916f-48d4d80c01e9" />
