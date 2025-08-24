@@ -6,6 +6,5 @@ This library provides the general code for the RAIL algorithm from this paper: R
 
 The code in this library is a generaliztion of code necessary to use DIRK and IMEX moethods to solve PDE's. Any valid butcher table for DIRK or IMEX methods can be inserted and the code will provide the necessary output. 
 
-#Structure 
-/-DIRK 
-/-IMEX
+#Structure:
+The library is split into two parts, one with the code for the DIRK methods and the other for IMEX methods. Within each folder you will see the possibilty to run two different tests: the accuracy test and the rank test. 
