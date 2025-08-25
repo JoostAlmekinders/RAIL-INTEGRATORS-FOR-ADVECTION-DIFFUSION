@@ -1,6 +1,10 @@
 # RAIL-INTEGRATORS-FOR-ADVECTION-DIFFUSION
 
 This library provides the general code for the RAIL algorithm from this paper: REDUCED AUGMENTATION IMPLICIT LOW-RANK (RAIL) INTEGRATORS FOR ADVECTION-DIFFUSION AND FOKKER--PLANCK MODELS by JOSEPH NAKAO, JING-MEI QIU, AND LUKAS EINKEMMER. DOI.10.1137/23M1622921(https://doi.org/10.1137/23M1622921). 
+Note: Any use of this code must cited. 
+
+**Reference**: 
+Nakao, Joseph, Jing-Mei Qiu, and Lukas Einkemmer. "Reduced Augmentation Implicit Low-rank (RAIL) integrators for advection-diffusion and Fokker–Planck models." SIAM Journal on Scientific Computing 47.2 (2025): A1145-A1169.
 
 ---
 
@@ -68,8 +72,4 @@ If we run the rank test we get this figure.
 <img width="626" height="472" alt="Screenshot 2025-08-24 at 11 25 55 AM" src="https://github.com/user-attachments/assets/20391cac-760d-4832-bd53-a88cc0894440" />
 
 
-
-
-Reference: 
-Nakao, Joseph, Jing-Mei Qiu, and Lukas Einkemmer. "Reduced Augmentation Implicit Low-rank (RAIL) integrators for advection-diffusion and Fokker–Planck models." SIAM Journal on Scientific Computing 47.2 (2025): A1145-A1169.
 
