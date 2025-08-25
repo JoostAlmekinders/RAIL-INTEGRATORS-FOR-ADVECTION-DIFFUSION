@@ -39,7 +39,9 @@ For DIRK 2 we insert the butcher table in the necessary area within the code lik
 
 We must then edit the order of the accuracy plot at the bottom of the file to ensure that we have second order for this method.
 This line must be edited to look like this: 
-``` </pre> plt.loglog(lambdav, np.power(lambdav, 2),'k-.',linewidth=1.5). ```
+``` </pre> 
+plt.loglog(lambdav, np.power(lambdav, 2),'k-.',linewidth=1.5).
+```
 
 The code will print the error value at each lamda value like this: 
 ``` </pre>
